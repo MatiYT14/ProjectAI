@@ -22,6 +22,14 @@ local function runRemote(source)
     if not ok then error(runtimeError) end
 end
 
+local function reloadRemote()
+    if _G.MatiDevAI_Cleanup then pcall(_G.MatiDevAI_Cleanup) end
+    local latest = fetch(FALLBACK_URL)
+    runRemote(latest)
+end
+
+_G.MatiDevAI_Reload = reloadRemote
+
 local ok, manifestText = pcall(fetch, MANIFEST_URL)
 local entry = FALLBACK_URL
 if ok then

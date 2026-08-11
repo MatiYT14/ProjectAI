@@ -4,7 +4,7 @@ local ChangeHistoryService = game:GetService("ChangeHistoryService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
-local NAME, VERSION = "MatiDev AI", "v1.1.0"
+local NAME, VERSION = "MatiDev AI", "v1.2.0"
 local toolbar = plugin:CreateToolbar(NAME)
 local toolbarButton = toolbar:CreateButton(NAME, "Open MatiDev AI", "")
 toolbarButton.ClickableWhenViewportHidden = true
@@ -42,6 +42,7 @@ make("TextLabel", {Position=UDim2.new(0,70,0,14), Size=UDim2.new(1,-90,0,25), Ba
 make("TextLabel", {Position=UDim2.new(0,70,0,40), Size=UDim2.new(1,-90,0,18), BackgroundTransparency=1, Text=VERSION.."  •  Created by MatiDev", TextColor3=colors.muted, Font=Enum.Font.Gotham, TextSize=10, TextXAlignment=Enum.TextXAlignment.Left}, top)
 local statusDot = make("Frame", {Position=UDim2.new(1,-112,0,29), Size=UDim2.new(0,8,0,8), BackgroundColor3=colors.green, BorderSizePixel=0}, top); rounded(statusDot, 8)
 local statusText = make("TextLabel", {Position=UDim2.new(1,-98,0,22), Size=UDim.new(0,84,0,22), BackgroundTransparency=1, Text="Ready", TextColor3=colors.green, Font=Enum.Font.GothamMedium, TextSize=11, TextXAlignment=Enum.TextXAlignment.Left}, top)
+local reloadButton = make("TextButton", {Position=UDim2.new(1,-190,0,22), Size=UDim2.new(0,78,0,28), BackgroundColor3=colors.panel2, BorderSizePixel=0, Text="Reload", TextColor3=colors.text, Font=Enum.Font.GothamBold, TextSize=10, AutoButtonColor=false}, top); rounded(reloadButton, 7, Color3.fromRGB(55,68,100))
 
 local side = make("Frame", {Position=UDim2.new(0,0,0,76), Size=UDim2.new(0,142,1,-76), BackgroundColor3=colors.panel, BorderSizePixel=0}, root)
 local sideTitle = make("TextLabel", {Position=UDim2.new(0,16,0,20), Size=UDim2.new(1,-32,0,18), BackgroundTransparency=1, Text="WORKSPACE", TextColor3=colors.muted, Font=Enum.Font.GothamBold, TextSize=10, TextXAlignment=Enum.TextXAlignment.Left}, side)
@@ -109,6 +110,11 @@ apply.MouseButton1Click:Connect(function()
     addLog(done and "✓ Applied: "..tostring(data.command.path) or "✕ Error: "..tostring(err), done and colors.green or colors.red)
 end)
 toolbarButton.Click:Connect(function() widget.Enabled=not widget.Enabled end)
+reloadButton.MouseEnter:Connect(function() tween(reloadButton, {BackgroundColor3=colors.blue}, .15) end)
+reloadButton.MouseLeave:Connect(function() tween(reloadButton, {BackgroundColor3=colors.panel2}, .15) end)
+reloadButton.MouseButton1Click:Connect(function()
+    if _G.MatiDevAI_Reload then _G.MatiDevAI_Reload() else addLog("Reload is available after installing the GitHub bootstrapper.", colors.muted) end
+end)
 local lastLogs=""; local phase=0
 RunService.Heartbeat:Connect(function(dt)
     phase+=dt; if statusText.Text=="Working" then statusDot.BackgroundTransparency=.15+(math.sin(phase*5)+1)*.18 else statusDot.BackgroundTransparency=0 end
@@ -125,3 +131,7 @@ task.spawn(function()
     end
 end)
 print(NAME.." "..VERSION.." loaded — Created by MatiDev")
+_G.MatiDevAI_Cleanup = function()
+    pcall(function() widget:Destroy() end)
+    pcall(function() toolbarButton:Destroy() end)
+end
