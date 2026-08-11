@@ -1,0 +1,8 @@
+{
+  "ollama_url": "http://127.0.0.1:11434/api/chat",
+  "model": "qwen2.5-coder:14b",
+  "workspace": "C:/ProjectAI/sandbox",
+  "memory_file": "C:/ProjectAI/memory/experiences.jsonl",
+  "max_revisions": 3,
+  "auto_apply": false
+}

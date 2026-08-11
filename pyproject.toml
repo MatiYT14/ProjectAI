@@ -1,0 +1,8 @@
+[project]
+name = "projectai"
+version = "0.1.0"
+description = "Local self-improving Roblox/Luau coding agent"
+requires-python = ">=3.10"
+
+[project.scripts]
+projectai = "projectai:main"
