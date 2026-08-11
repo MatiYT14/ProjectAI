@@ -1,55 +1,80 @@
--- ProjectAI Studio v1.0: docked AI panel + local MCP bridge
+-- MatiDev AI remote runtime v1.1.0
 local HttpService = game:GetService("HttpService")
 local ChangeHistoryService = game:GetService("ChangeHistoryService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-local PLUGIN_NAME = "MatiDev AI"
-local VERSION = "v1.0.0"
-local toolbar = plugin:CreateToolbar(PLUGIN_NAME)
-local button = toolbar:CreateButton(PLUGIN_NAME, "Open MatiDev AI assistant", "")
-button.ClickableWhenViewportHidden = true
-local info = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Right, true, false, 390, 560, 300, 300)
-local widget = plugin:CreateDockWidgetPluginGui("ProjectAI_V1", info)
-widget.Title = "ProjectAI • Roblox Developer"
 
-local function new(class, props, parent)
-    local x = Instance.new(class)
-    for k, v in pairs(props or {}) do x[k] = v end
-    x.Parent = parent
-    return x
+local NAME, VERSION = "MatiDev AI", "v1.1.0"
+local toolbar = plugin:CreateToolbar(NAME)
+local toolbarButton = toolbar:CreateButton(NAME, "Open MatiDev AI", "")
+toolbarButton.ClickableWhenViewportHidden = true
+local widgetInfo = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Right, true, false, 500, 650, 400, 420)
+local widget = plugin:CreateDockWidgetPluginGui("MatiDevAI_Main", widgetInfo)
+widget.Title = NAME
+
+local function make(className, props, parent)
+    local obj = Instance.new(className)
+    for key, value in pairs(props or {}) do obj[key] = value end
+    obj.Parent = parent
+    return obj
 end
-local bg = new("Frame", {Size=UDim2.fromScale(1,1), BackgroundColor3=Color3.fromRGB(15,18,25), BorderSizePixel=0}, widget)
-local header = new("Frame", {Size=UDim2.new(1,0,0,58), BackgroundColor3=Color3.fromRGB(23,28,40), BorderSizePixel=0}, bg)
-new("UIGradient", {Color=ColorSequence.new(Color3.fromRGB(36,52,86), Color3.fromRGB(23,28,40)), Rotation=25}, header)
-new("Frame", {Position=UDim2.new(0,0,1,-2), Size=UDim2.new(1,0,0,2), BackgroundColor3=Color3.fromRGB(76,125,255), BorderSizePixel=0}, header)
-new("TextLabel", {Position=UDim2.new(0,18,0,6), Size=UDim2.new(1,-36,0,24), BackgroundTransparency=1, Text=PLUGIN_NAME, TextColor3=Color3.fromRGB(235,241,255), Font=Enum.Font.GothamBold, TextSize=18, TextXAlignment=Enum.TextXAlignment.Left}, header)
-new("TextLabel", {Position=UDim2.new(0,18,0,29), Size=UDim2.new(1,-36,0,14), BackgroundTransparency=1, Text=VERSION.."  •  Created by MatiDev", TextColor3=Color3.fromRGB(145,157,183), Font=Enum.Font.Gotham, TextSize=10, TextXAlignment=Enum.TextXAlignment.Left}, header)
-local status = new("TextLabel", {Position=UDim2.new(0,18,0,43), Size=UDim2.new(1,-36,0,14), BackgroundTransparency=1, Text="●  Ready", TextColor3=Color3.fromRGB(95,220,155), Font=Enum.Font.Gotham, TextSize=10, TextXAlignment=Enum.TextXAlignment.Left}, header)
-local logFrame = new("ScrollingFrame", {Position=UDim2.new(0,12,0,70), Size=UDim2.new(1,-24,1,-190), BackgroundColor3=Color3.fromRGB(10,12,18), BorderSizePixel=0, CanvasSize=UDim2.new(), AutomaticCanvasSize=Enum.AutomaticSize.Y, ScrollBarThickness=5}, bg)
-new("UIPadding", {PaddingTop=UDim.new(0,12), PaddingBottom=UDim.new(0,12), PaddingLeft=UDim.new(0,12), PaddingRight=UDim.new(0,12)}, logFrame)
-local layout = new("UIListLayout", {Padding=UDim.new(0,7), SortOrder=Enum.SortOrder.LayoutOrder}, logFrame)
-local input = new("TextBox", {Position=UDim2.new(0,12,1,-108), Size=UDim2.new(1,-24,0,62), BackgroundColor3=Color3.fromRGB(28,33,46), BorderSizePixel=0, ClearTextOnFocus=false, MultiLine=true, PlaceholderText="Describe what you want to build...", Text="", TextColor3=Color3.fromRGB(230,235,245), PlaceholderColor3=Color3.fromRGB(130,140,160), Font=Enum.Font.Gotham, TextSize=13, TextWrapped=true, TextXAlignment=Enum.TextXAlignment.Left, TextYAlignment=Enum.TextYAlignment.Top}, bg)
-new("UIPadding", {PaddingTop=UDim.new(0,10), PaddingLeft=UDim.new(0,10), PaddingRight=UDim.new(0,10)}, input)
-local send = new("TextButton", {Position=UDim2.new(1,-112,1,-38), Size=UDim2.new(0,100,0,30), BackgroundColor3=Color3.fromRGB(76,125,255), BorderSizePixel=0, Text="Send  ↗", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12}, bg)
-local apply = new("TextButton", {Position=UDim2.new(0,12,1,-38), Size=UDim2.new(0,100,0,30), BackgroundColor3=Color3.fromRGB(39,49,69), BorderSizePixel=0, Text="Zastosuj", TextColor3=Color3.fromRGB(220,228,245), Font=Enum.Font.GothamBold, TextSize=12}, bg)
-local pulseTime = 0
-local function style(obj, radius, strokeColor)
-    new("UICorner", {CornerRadius=UDim.new(0, radius)}, obj)
-    if strokeColor then new("UIStroke", {Color=strokeColor, Transparency=0.55, Thickness=1}, obj) end
+local function rounded(obj, radius, stroke)
+    make("UICorner", {CornerRadius=UDim.new(0, radius)}, obj)
+    if stroke then make("UIStroke", {Color=stroke, Transparency=0.55, Thickness=1}, obj) end
 end
-style(logFrame, 8, Color3.fromRGB(65,78,108)); style(input, 8, Color3.fromRGB(65,78,108)); style(send, 7); style(apply, 7)
+local function tween(obj, props, duration)
+    TweenService:Create(obj, TweenInfo.new(duration or .18, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), props):Play()
+end
+
+local colors = {
+    background=Color3.fromRGB(11,14,21), panel=Color3.fromRGB(18,23,34), panel2=Color3.fromRGB(24,30,44),
+    text=Color3.fromRGB(235,241,255), muted=Color3.fromRGB(137,149,175), blue=Color3.fromRGB(89,126,255),
+    green=Color3.fromRGB(88,222,157), yellow=Color3.fromRGB(255,194,91), red=Color3.fromRGB(255,109,122)
+}
+local root = make("Frame", {Size=UDim2.fromScale(1,1), BackgroundColor3=colors.background, BorderSizePixel=0}, widget)
+local top = make("Frame", {Size=UDim2.new(1,0,0,76), BackgroundColor3=colors.panel, BorderSizePixel=0}, root)
+make("UIGradient", {Color=ColorSequence.new(colors.panel2, colors.panel), Rotation=20}, top)
+make("Frame", {Position=UDim2.new(0,0,1,-2), Size=UDim2.new(1,0,0,2), BackgroundColor3=colors.blue, BorderSizePixel=0}, top)
+local logo = make("Frame", {Position=UDim2.new(0,18,0,17), Size=UDim2.new(0,40,0,40), BackgroundColor3=colors.blue, BorderSizePixel=0}, top)
+rounded(logo, 12); make("UIGradient", {Color=ColorSequence.new(Color3.fromRGB(123,154,255), colors.blue), Rotation=45}, logo)
+make("TextLabel", {Size=UDim2.fromScale(1,1), BackgroundTransparency=1, Text="M", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=22}, logo)
+make("TextLabel", {Position=UDim2.new(0,70,0,14), Size=UDim2.new(1,-90,0,25), BackgroundTransparency=1, Text=NAME, TextColor3=colors.text, Font=Enum.Font.GothamBold, TextSize=18, TextXAlignment=Enum.TextXAlignment.Left}, top)
+make("TextLabel", {Position=UDim2.new(0,70,0,40), Size=UDim2.new(1,-90,0,18), BackgroundTransparency=1, Text=VERSION.."  •  Created by MatiDev", TextColor3=colors.muted, Font=Enum.Font.Gotham, TextSize=10, TextXAlignment=Enum.TextXAlignment.Left}, top)
+local statusDot = make("Frame", {Position=UDim2.new(1,-112,0,29), Size=UDim2.new(0,8,0,8), BackgroundColor3=colors.green, BorderSizePixel=0}, top); rounded(statusDot, 8)
+local statusText = make("TextLabel", {Position=UDim2.new(1,-98,0,22), Size=UDim.new(0,84,0,22), BackgroundTransparency=1, Text="Ready", TextColor3=colors.green, Font=Enum.Font.GothamMedium, TextSize=11, TextXAlignment=Enum.TextXAlignment.Left}, top)
+
+local side = make("Frame", {Position=UDim2.new(0,0,0,76), Size=UDim2.new(0,142,1,-76), BackgroundColor3=colors.panel, BorderSizePixel=0}, root)
+local sideTitle = make("TextLabel", {Position=UDim2.new(0,16,0,20), Size=UDim2.new(1,-32,0,18), BackgroundTransparency=1, Text="WORKSPACE", TextColor3=colors.muted, Font=Enum.Font.GothamBold, TextSize=10, TextXAlignment=Enum.TextXAlignment.Left}, side)
+local function nav(label, y, active)
+    local button = make("TextButton", {Position=UDim2.new(0,10,0,y), Size=UDim2.new(1,-20,0,36), BackgroundColor3=active and Color3.fromRGB(42,56,95) or Color3.fromRGB(0,0,0), BackgroundTransparency=active and 0 or 1, BorderSizePixel=0, Text="  "..label, TextColor3=active and colors.text or colors.muted, Font=Enum.Font.GothamMedium, TextSize=12, TextXAlignment=Enum.TextXAlignment.Left}, side)
+    rounded(button, 8)
+    if active then make("Frame", {Position=UDim2.new(0,0,0,8), Size=UDim2.new(0,3,0,20), BackgroundColor3=colors.blue, BorderSizePixel=0}, button) end
+    button.MouseEnter:Connect(function() if not active then tween(button, {BackgroundTransparency=.75}, .15) end end)
+    button.MouseLeave:Connect(function() if not active then tween(button, {BackgroundTransparency=1}, .15) end end)
+    return button
+end
+nav("Chat", 52, true); nav("Activity", 94, false); nav("Settings", 136, false)
+make("TextLabel", {Position=UDim2.new(0,16,1,-54), Size=UDim2.new(1,-32,0,34), BackgroundTransparency=1, Text="LOCAL AGENT\nOllama + MCP Bridge", TextColor3=colors.muted, Font=Enum.Font.Code, TextSize=10, TextXAlignment=Enum.TextXAlignment.Left, TextYAlignment=Enum.TextYAlignment.Bottom}, side)
+
+local content = make("Frame", {Position=UDim2.new(0,142,0,76), Size=UDim2.new(1,-142,1,-76), BackgroundTransparency=1}, root)
+local hero = make("Frame", {Position=UDim2.new(0,20,0,18), Size=UDim2.new(1,-40,0,74), BackgroundColor3=colors.panel2, BorderSizePixel=0}, content); rounded(hero, 12, Color3.fromRGB(55,68,100))
+make("TextLabel", {Position=UDim2.new(0,16,0,12), Size=UDim2.new(1,-32,0,22), BackgroundTransparency=1, Text="What are we building today?", TextColor3=colors.text, Font=Enum.Font.GothamBold, TextSize=15, TextXAlignment=Enum.TextXAlignment.Left}, hero)
+make("TextLabel", {Position=UDim2.new(0,16,0,38), Size=UDim2.new(1,-32,0,20), BackgroundTransparency=1, Text="Describe a feature, system, or complete Roblox game.", TextColor3=colors.muted, Font=Enum.Font.Gotham, TextSize=11, TextXAlignment=Enum.TextXAlignment.Left}, hero)
+local log = make("ScrollingFrame", {Position=UDim2.new(0,20,0,108), Size=UDim2.new(1,-40,1,-270), BackgroundColor3=colors.panel, BorderSizePixel=0, ScrollBarThickness=4, AutomaticCanvasSize=Enum.AutomaticSize.Y, CanvasSize=UDim2.new()}, content); rounded(log, 12, Color3.fromRGB(45,55,80))
+make("UIPadding", {PaddingTop=UDim.new(0,14), PaddingBottom=UDim.new(0,14), PaddingLeft=UDim.new(0,14), PaddingRight=UDim.new(0,14)}, log)
+make("UIListLayout", {Padding=UDim.new(0,8), SortOrder=Enum.SortOrder.LayoutOrder}, log)
+local input = make("TextBox", {Position=UDim2.new(0,20,1,-144), Size=UDim2.new(1,-40,0,78), BackgroundColor3=colors.panel2, BorderSizePixel=0, ClearTextOnFocus=false, MultiLine=true, PlaceholderText="Describe what you want to build...", Text="", TextColor3=colors.text, PlaceholderColor3=colors.muted, Font=Enum.Font.Gotham, TextSize=12, TextWrapped=true, TextXAlignment=Enum.TextXAlignment.Left, TextYAlignment=Enum.TextYAlignment.Top}, content); rounded(input, 12, Color3.fromRGB(55,68,100)); make("UIPadding", {PaddingTop=UDim.new(0,12), PaddingLeft=UDim.new(0,12), PaddingRight=UDim.new(0,12)}, input)
+local apply = make("TextButton", {Position=UDim2.new(0,20,1,-54), Size=UDim2.new(0,112,0,34), BackgroundColor3=colors.panel2, BorderSizePixel=0, Text="Apply changes", TextColor3=colors.text, Font=Enum.Font.GothamBold, TextSize=11}, content); rounded(apply, 8, Color3.fromRGB(55,68,100))
+local send = make("TextButton", {Position=UDim2.new(1,-132,1,-54), Size=UDim2.new(0,112,0,34), BackgroundColor3=colors.blue, BorderSizePixel=0, Text="Send  ↗", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=11}, content); rounded(send, 8)
 
 local function addLog(text, color)
-    new("TextLabel", {Size=UDim2.new(1,0,0,0), AutomaticSize=Enum.AutomaticSize.Y, BackgroundTransparency=1, Text=tostring(text), TextColor3=color or Color3.fromRGB(190,198,215), Font=Enum.Font.Code, TextSize=11, TextWrapped=true, TextXAlignment=Enum.TextXAlignment.Left}, logFrame)
+    local card = make("TextLabel", {Size=UDim2.new(1,0,0,0), AutomaticSize=Enum.AutomaticSize.Y, BackgroundTransparency=1, Text=tostring(text), TextColor3=color or Color3.fromRGB(190,198,215), Font=Enum.Font.Code, TextSize=10, TextWrapped=true, TextXAlignment=Enum.TextXAlignment.Left}, log)
+    card.TextTransparency = 1; tween(card, {TextTransparency=0}, .22)
 end
 local function request(method, path, body)
-    local opts = {Url="http://127.0.0.1:8765"..path, Method=method, Headers={ ["Content-Type"]="application/json" }}
-    if body then opts.Body=HttpService:JSONEncode(body) end
-    return HttpService:RequestAsync(opts)
-end
-local function findOrCreate(parent, name, className)
-    local found=parent:FindFirstChild(name); if found then return found end
-    local obj=Instance.new(className); obj.Name=name; obj.Parent=parent; return obj
+    local options={Url="http://127.0.0.1:8765"..path, Method=method, Headers={["Content-Type"]="application/json"}}
+    if body then options.Body=HttpService:JSONEncode(body) end
+    return HttpService:RequestAsync(options)
 end
 local function resolvePath(path)
     local parts=string.split(path,"/"); local root=table.remove(parts,1)
@@ -58,54 +83,45 @@ local function resolvePath(path)
     for i,name in ipairs(parts) do
         local final=i==#parts; local clean=final and string.gsub(name,"%.lua$","") or name
         local class=final and (root=="StarterPlayerScripts" and "LocalScript" or (string.find(clean,"Module") and "ModuleScript" or "Script")) or "Folder"
-        parent=findOrCreate(parent,clean,class)
+        local found=parent:FindFirstChild(clean)
+        if not found then found=Instance.new(class); found.Name=clean; found.Parent=parent end
+        parent=found
     end
     return parent
 end
-local function applyCommand(cmd)
-    if cmd.op~="write_script" then error("Unsupported operation: "..tostring(cmd.op)) end
-    local obj=resolvePath(cmd.path); obj.Source=cmd.source; ChangeHistoryService:SetWaypoint("ProjectAI: "..cmd.path)
+local function applyCommand(command)
+    if command.op~="write_script" then error("Unsupported operation: "..tostring(command.op)) end
+    local scriptObject=resolvePath(command.path); scriptObject.Source=command.source; ChangeHistoryService:SetWaypoint("MatiDev AI: "..command.path)
 end
 local function submit()
-    if input.Text == "" then return end
-    local taskText=input.Text; input.Text=""; addLog("> "..taskText, Color3.fromRGB(140,170,255)); status.Text="●  Working..."; status.TextColor3=Color3.fromRGB(255,194,82)
-    local ok, res=pcall(function() return request("POST", "/task", {task=taskText}) end)
-    if not ok or not res.Success then addLog("Bridge unavailable. Run start-bridge.ps1.", Color3.fromRGB(255,110,110)); status.Text="●  Offline"; status.TextColor3=Color3.fromRGB(255,110,110) end
+    if input.Text=="" then return end
+    local taskText=input.Text; input.Text=""; addLog("> "..taskText, Color3.fromRGB(145,175,255)); statusText.Text="Working"; statusText.TextColor3=colors.yellow; statusDot.BackgroundColor3=colors.yellow
+    local ok,res=pcall(function() return request("POST","/task",{task=taskText}) end)
+    if not ok or not res.Success then addLog("Bridge unavailable. Run start-bridge.ps1.", colors.red); statusText.Text="Offline"; statusText.TextColor3=colors.red; statusDot.BackgroundColor3=colors.red end
 end
-send.MouseButton1Click:Connect(submit)
-input.FocusLost:Connect(function(enter) if enter then submit() end end)
-button.Click:Connect(function() widget.Enabled=not widget.Enabled end)
+send.MouseButton1Click:Connect(submit); input.FocusLost:Connect(function(enter) if enter then submit() end end)
 apply.MouseButton1Click:Connect(function()
     local ok,res=pcall(function() return request("GET","/poll") end)
-    if ok and res.Success then
-        local d=HttpService:JSONDecode(res.Body)
-        if d.command then
-            local done,err=pcall(function() applyCommand(d.command) end)
-            pcall(function() request("POST","/result",{ok=done,error=err}) end)
-            addLog(done and "✓ Applied: "..tostring(d.command.path) or "✕ Error: "..tostring(err), done and Color3.fromRGB(95,220,155) or Color3.fromRGB(255,110,110))
-        else addLog("No pending changes.") end
-    else addLog("Could not connect to the bridge.", Color3.fromRGB(255,110,110)) end
+    if not ok or not res.Success then addLog("Could not connect to the bridge.", colors.red); return end
+    local data=HttpService:JSONDecode(res.Body)
+    if not data.command then addLog("No pending changes."); return end
+    local done,err=pcall(function() applyCommand(data.command) end); pcall(function() request("POST","/result",{ok=done,error=err}) end)
+    addLog(done and "✓ Applied: "..tostring(data.command.path) or "✕ Error: "..tostring(err), done and colors.green or colors.red)
 end)
-
+toolbarButton.Click:Connect(function() widget.Enabled=not widget.Enabled end)
+local lastLogs=""; local phase=0
+RunService.Heartbeat:Connect(function(dt)
+    phase+=dt; if statusText.Text=="Working" then statusDot.BackgroundTransparency=.15+(math.sin(phase*5)+1)*.18 else statusDot.BackgroundTransparency=0 end
+end)
 task.spawn(function()
-    local last=""
     while true do
         task.wait(1)
         local ok,res=pcall(function() return request("GET","/status") end)
         if ok and res.Success then
-            local d=HttpService:JSONDecode(res.Body); status.Text=d.running and "●  Working..." or (d.queued>0 and "●  Changes ready" or "●  Ready")
-            status.TextColor3=d.running and Color3.fromRGB(255,194,82) or Color3.fromRGB(95,220,155)
-            local joined=table.concat(d.logs,"\n")
-            if joined~=last then last=joined; for _,child in ipairs(logFrame:GetChildren()) do if child:IsA("TextLabel") then child:Destroy() end end; for _,line in ipairs(d.logs) do addLog(line) end end
+            local data=HttpService:JSONDecode(res.Body); statusText.Text=data.running and "Working" or (data.queued>0 and "Changes ready" or "Ready"); statusText.TextColor3=data.running and colors.yellow or colors.green; statusDot.BackgroundColor3=data.running and colors.yellow or colors.green
+            local joined=table.concat(data.logs,"\n")
+            if joined~=lastLogs then lastLogs=joined; for _,child in ipairs(log:GetChildren()) do if child:IsA("TextLabel") then child:Destroy() end end; for _,line in ipairs(data.logs) do addLog(line) end end
         end
     end
 end)
-print(PLUGIN_NAME.." "..VERSION.." loaded — Created by MatiDev")
-RunService.Heartbeat:Connect(function(dt)
-    pulseTime += dt
-    if status.Text:find("Working") then
-        status.TextTransparency = 0.15 + (math.sin(pulseTime * 5) + 1) * 0.18
-    else
-        status.TextTransparency = 0
-    end
-end)
+print(NAME.." "..VERSION.." loaded — Created by MatiDev")
