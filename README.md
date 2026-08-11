@@ -1,33 +1,33 @@
 # ProjectAI
 
-Lokalny agent AI do tworzenia projektów Roblox/Luau.
+Local AI agent for building Roblox/Luau projects.
 
 ## Start
 
-1. Zainstaluj Python 3.10+ i Ollama.
-2. Masz już pobrany model `qwen2.5-coder:14b`.
-3. Uruchom: `powershell -ExecutionPolicy Bypass -File C:\ProjectAI\start.ps1`
-4. Wpisz zadanie, np. `Stwórz obby z checkpointami, monetami i sklepem`.
+1. Install Python 3.10+ and Ollama.
+2. The `qwen2.5-coder:14b` model is already configured.
+3. Run `powershell -ExecutionPolicy Bypass -File C:\ProjectAI\start.ps1`.
+4. Enter a task such as `Create an obby with checkpoints, coins, and a shop`.
 
-Wyniki trafiają do `sandbox/run-...`. Agent ma pamięć doświadczeń w
-`memory/experiences.jsonl`, wykonuje kilka rewizji i nie nadpisuje istniejących
-projektów.
+Results are written to `sandbox/run-*`. The agent keeps project experience in
+`memory/experiences.jsonl`, performs revisions, and does not overwrite live
+projects by default.
 
-## Bridge MCP do Roblox Studio
+## MCP bridge for Roblox Studio
 
-Uruchom w drugim PowerShellu:
+Run in a second PowerShell window:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File C:\ProjectAI\start-bridge.ps1
 ```
 
-W Roblox Studio utwórz plugin z pliku `RobloxStudioProjectAI.lua` i włącz
-`Game Settings > Security > Allow HTTP Requests`. Następnie generuj projekt z:
+Install `RobloxStudioProjectAI.lua` as a Studio plugin and allow the plugin to
+connect to localhost when prompted. Then run:
 
 ```powershell
-python C:\ProjectAI\projectai.py --studio "Stwórz system checkpointów i monet"
+python C:\ProjectAI\projectai.py --studio "Create a checkpoint and coin system"
 ```
 
-Kliknięcie przycisku ProjectAI w toolbarze Studio pobierze kolejkę i wstawi
-skrypty do właściwych usług. Każda zmiana tworzy waypoint w Change History,
-więc można ją cofnąć. Bridge nasłuchuje wyłącznie na localhost.
+Clicking the ProjectAI toolbar button applies queued scripts to the correct
+services. Each change creates a Change History waypoint, so it can be undone.
+The bridge listens on localhost only.

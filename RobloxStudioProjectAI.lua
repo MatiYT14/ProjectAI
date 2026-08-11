@@ -28,9 +28,9 @@ local status = new("TextLabel", {Position=UDim2.new(0,18,0,43), Size=UDim2.new(1
 local logFrame = new("ScrollingFrame", {Position=UDim2.new(0,12,0,70), Size=UDim2.new(1,-24,1,-190), BackgroundColor3=Color3.fromRGB(10,12,18), BorderSizePixel=0, CanvasSize=UDim2.new(), AutomaticCanvasSize=Enum.AutomaticSize.Y, ScrollBarThickness=5}, bg)
 new("UIPadding", {PaddingTop=UDim.new(0,12), PaddingBottom=UDim.new(0,12), PaddingLeft=UDim.new(0,12), PaddingRight=UDim.new(0,12)}, logFrame)
 local layout = new("UIListLayout", {Padding=UDim.new(0,7), SortOrder=Enum.SortOrder.LayoutOrder}, logFrame)
-local input = new("TextBox", {Position=UDim2.new(0,12,1,-108), Size=UDim2.new(1,-24,0,62), BackgroundColor3=Color3.fromRGB(28,33,46), BorderSizePixel=0, ClearTextOnFocus=false, MultiLine=true, PlaceholderText="Opisz, co mam zbudować...", Text="", TextColor3=Color3.fromRGB(230,235,245), PlaceholderColor3=Color3.fromRGB(130,140,160), Font=Enum.Font.Gotham, TextSize=13, TextWrapped=true, TextXAlignment=Enum.TextXAlignment.Left, TextYAlignment=Enum.TextYAlignment.Top}, bg)
+local input = new("TextBox", {Position=UDim2.new(0,12,1,-108), Size=UDim2.new(1,-24,0,62), BackgroundColor3=Color3.fromRGB(28,33,46), BorderSizePixel=0, ClearTextOnFocus=false, MultiLine=true, PlaceholderText="Describe what you want to build...", Text="", TextColor3=Color3.fromRGB(230,235,245), PlaceholderColor3=Color3.fromRGB(130,140,160), Font=Enum.Font.Gotham, TextSize=13, TextWrapped=true, TextXAlignment=Enum.TextXAlignment.Left, TextYAlignment=Enum.TextYAlignment.Top}, bg)
 new("UIPadding", {PaddingTop=UDim.new(0,10), PaddingLeft=UDim.new(0,10), PaddingRight=UDim.new(0,10)}, input)
-local send = new("TextButton", {Position=UDim2.new(1,-112,1,-38), Size=UDim2.new(0,100,0,30), BackgroundColor3=Color3.fromRGB(76,125,255), BorderSizePixel=0, Text="Wyślij  ↗", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12}, bg)
+local send = new("TextButton", {Position=UDim2.new(1,-112,1,-38), Size=UDim2.new(0,100,0,30), BackgroundColor3=Color3.fromRGB(76,125,255), BorderSizePixel=0, Text="Send  ↗", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12}, bg)
 local apply = new("TextButton", {Position=UDim2.new(0,12,1,-38), Size=UDim2.new(0,100,0,30), BackgroundColor3=Color3.fromRGB(39,49,69), BorderSizePixel=0, Text="Zastosuj", TextColor3=Color3.fromRGB(220,228,245), Font=Enum.Font.GothamBold, TextSize=12}, bg)
 local pulseTime = 0
 local function style(obj, radius, strokeColor)
@@ -70,7 +70,7 @@ local function submit()
     if input.Text == "" then return end
     local taskText=input.Text; input.Text=""; addLog("> "..taskText, Color3.fromRGB(140,170,255)); status.Text="●  Working..."; status.TextColor3=Color3.fromRGB(255,194,82)
     local ok, res=pcall(function() return request("POST", "/task", {task=taskText}) end)
-    if not ok or not res.Success then addLog("Bridge niedostępny. Uruchom start-bridge.ps1.", Color3.fromRGB(255,110,110)); status.Text="●  Offline"; status.TextColor3=Color3.fromRGB(255,110,110) end
+    if not ok or not res.Success then addLog("Bridge unavailable. Run start-bridge.ps1.", Color3.fromRGB(255,110,110)); status.Text="●  Offline"; status.TextColor3=Color3.fromRGB(255,110,110) end
 end
 send.MouseButton1Click:Connect(submit)
 input.FocusLost:Connect(function(enter) if enter then submit() end end)
@@ -82,9 +82,9 @@ apply.MouseButton1Click:Connect(function()
         if d.command then
             local done,err=pcall(function() applyCommand(d.command) end)
             pcall(function() request("POST","/result",{ok=done,error=err}) end)
-            addLog(done and "✓ Zastosowano: "..tostring(d.command.path) or "✕ Błąd: "..tostring(err), done and Color3.fromRGB(95,220,155) or Color3.fromRGB(255,110,110))
-        else addLog("Brak oczekujących zmian.") end
-    else addLog("Nie można połączyć się z bridge'em.", Color3.fromRGB(255,110,110)) end
+            addLog(done and "✓ Applied: "..tostring(d.command.path) or "✕ Error: "..tostring(err), done and Color3.fromRGB(95,220,155) or Color3.fromRGB(255,110,110))
+        else addLog("No pending changes.") end
+    else addLog("Could not connect to the bridge.", Color3.fromRGB(255,110,110)) end
 end)
 
 task.spawn(function()
