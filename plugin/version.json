@@ -1,0 +1,6 @@
+{
+  "name": "MatiDev AI",
+  "version": "1.0.0",
+  "entry": "https://raw.githubusercontent.com/MatiYT14/ProjectAI/main/plugin/Main.lua",
+  "changelog": "Initial GitHub-hosted runtime"
+}

@@ -31,3 +31,11 @@ python C:\ProjectAI\projectai.py --studio "Create a checkpoint and coin system"
 Clicking the ProjectAI toolbar button applies queued scripts to the correct
 services. Each change creates a Change History waypoint, so it can be undone.
 The bridge listens on localhost only.
+
+## GitHub-hosted plugin
+
+`plugin/Bootstrapper.lua` is the small script intended for the one-time Roblox
+plugin publication. It downloads `plugin/version.json` and the current
+`plugin/Main.lua` from GitHub at startup. Update the runtime in GitHub without
+republishing the bootstrapper. The first run may ask Studio for permission to
+communicate with `raw.githubusercontent.com`.
