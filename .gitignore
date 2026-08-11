@@ -6,3 +6,4 @@ logs/
 checkpoints/
 experiments/
 *.local.json
+plugin/LocalBackup_*.lua
